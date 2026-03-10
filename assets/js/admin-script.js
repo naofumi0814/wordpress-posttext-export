@@ -15,8 +15,11 @@
             $btn.prop('disabled', true);
             $result.text(wpteAdmin.strings.counting).removeClass('has-results no-results');
 
-            // フォーム全体をシリアライズして送信（全フィルタ条件を確実に含める）
-            var formData = $('#wpte-export-form').serialize();
+            // フォームのフィルタ条件のみ収集（エクスポート用nonceは除外してexport発動を防ぐ）
+            var formData = $('#wpte-export-form')
+                .find(':input')
+                .not('[name="wpte_export_nonce"], [name="_wp_http_referer"], [name="export_format"], [name="filename"], [name="fields[]"], [name="separator_type"], [name="custom_separator"], [name="include_heading"], [name="heading_separator"], [name="post_separator"]')
+                .serialize();
             formData += '&action=wpte_count_posts&nonce=' + encodeURIComponent(wpteAdmin.nonce);
 
             $.post(wpteAdmin.ajaxUrl, formData)

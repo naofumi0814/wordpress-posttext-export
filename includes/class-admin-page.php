@@ -135,6 +135,9 @@ class WPTE_Admin_Page {
 
     /**
      * AJAX: 投稿件数を取得する
+     *
+     * フォーム全体がserialize()で送信されるため、
+     * get_query_params_from_post() を再利用して全フィルタ条件を適用する
      */
     public function ajax_count_posts(): void {
         check_ajax_referer( 'wpte_count_nonce', 'nonce' );
@@ -143,24 +146,8 @@ class WPTE_Admin_Page {
             wp_send_json_error( array( 'message' => '権限がありません' ) );
         }
 
-        $query_params = array(
-            'post_types'    => isset( $_POST['post_types'] ) && is_array( $_POST['post_types'] )
-                ? array_map( 'sanitize_key', wp_unslash( $_POST['post_types'] ) )
-                : array( 'post' ),
-            'post_statuses' => isset( $_POST['post_statuses'] ) && is_array( $_POST['post_statuses'] )
-                ? array_map( 'sanitize_key', wp_unslash( $_POST['post_statuses'] ) )
-                : array( 'publish' ),
-            'date_from'     => isset( $_POST['date_from'] ) ? sanitize_text_field( wp_unslash( $_POST['date_from'] ) ) : '',
-            'date_to'       => isset( $_POST['date_to'] ) ? sanitize_text_field( wp_unslash( $_POST['date_to'] ) ) : '',
-            'keyword'       => isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '',
-            'post_ids'      => isset( $_POST['post_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['post_ids'] ) ) : '',
-            'category_ids'  => isset( $_POST['category_ids'] ) && is_array( $_POST['category_ids'] )
-                ? array_map( 'absint', wp_unslash( $_POST['category_ids'] ) )
-                : array(),
-            'tag_ids'       => isset( $_POST['tag_ids'] ) && is_array( $_POST['tag_ids'] )
-                ? array_map( 'absint', wp_unslash( $_POST['tag_ids'] ) )
-                : array(),
-        );
+        // エクスポート時と同じメソッドでパラメータを取得（全条件を確実に反映）
+        $query_params = $this->get_query_params_from_post();
 
         $query = new WPTE_Post_Query();
         $count = $query->count_posts( $query_params );

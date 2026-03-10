@@ -15,41 +15,11 @@
             $btn.prop('disabled', true);
             $result.text(wpteAdmin.strings.counting).removeClass('has-results no-results');
 
-            // フォームデータを収集
-            var data = {
-                action: 'wpte_count_posts',
-                nonce: wpteAdmin.nonce,
-                post_types: [],
-                post_statuses: [],
-                category_ids: [],
-                tag_ids: [],
-                date_from: $('input[name="date_from"]').val(),
-                date_to: $('input[name="date_to"]').val(),
-                keyword: $('input[name="keyword"]').val(),
-                post_ids: $('input[name="post_ids"]').val()
-            };
+            // フォーム全体をシリアライズして送信（全フィルタ条件を確実に含める）
+            var formData = $('#wpte-export-form').serialize();
+            formData += '&action=wpte_count_posts&nonce=' + encodeURIComponent(wpteAdmin.nonce);
 
-            // チェックされた投稿タイプ
-            $('input[name="post_types[]"]:checked').each(function () {
-                data.post_types.push($(this).val());
-            });
-
-            // チェックされたステータス
-            $('input[name="post_statuses[]"]:checked').each(function () {
-                data.post_statuses.push($(this).val());
-            });
-
-            // チェックされたカテゴリー
-            $('input[name="category_ids[]"]:checked').each(function () {
-                data.category_ids.push($(this).val());
-            });
-
-            // チェックされたタグ
-            $('input[name="tag_ids[]"]:checked').each(function () {
-                data.tag_ids.push($(this).val());
-            });
-
-            $.post(wpteAdmin.ajaxUrl, data)
+            $.post(wpteAdmin.ajaxUrl, formData)
                 .done(function (response) {
                     if (response.success) {
                         var count = response.data.count;

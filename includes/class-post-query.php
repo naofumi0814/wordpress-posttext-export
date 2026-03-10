@@ -134,6 +134,34 @@ class WPTE_Post_Query {
     }
 
     /**
+     * 利用可能なカテゴリー一覧を取得する
+     *
+     * @return WP_Term[]
+     */
+    public static function get_available_categories(): array {
+        $categories = get_categories( array(
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+            'hide_empty' => false,
+        ) );
+        return is_array( $categories ) ? $categories : array();
+    }
+
+    /**
+     * 利用可能なタグ一覧を取得する
+     *
+     * @return WP_Term[]
+     */
+    public static function get_available_tags(): array {
+        $tags = get_tags( array(
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+            'hide_empty' => false,
+        ) );
+        return is_array( $tags ) ? $tags : array();
+    }
+
+    /**
      * 利用可能な投稿タイプ一覧を取得する
      *
      * @return array label => name のペア

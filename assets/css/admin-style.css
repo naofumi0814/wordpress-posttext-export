@@ -42,6 +42,16 @@
     margin-right: 6px;
 }
 
+/* タクソノミー一覧（カテゴリー・タグ）のスクロール領域 */
+.wpte-taxonomy-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 3px;
+    background: #fafafa;
+}
+
 .wpte-slug {
     color: #999;
     font-size: 12px;

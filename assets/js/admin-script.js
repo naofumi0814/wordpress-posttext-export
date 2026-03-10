@@ -21,6 +21,8 @@
                 nonce: wpteAdmin.nonce,
                 post_types: [],
                 post_statuses: [],
+                category_ids: [],
+                tag_ids: [],
                 date_from: $('input[name="date_from"]').val(),
                 date_to: $('input[name="date_to"]').val(),
                 keyword: $('input[name="keyword"]').val(),
@@ -35,6 +37,16 @@
             // チェックされたステータス
             $('input[name="post_statuses[]"]:checked').each(function () {
                 data.post_statuses.push($(this).val());
+            });
+
+            // チェックされたカテゴリー
+            $('input[name="category_ids[]"]:checked').each(function () {
+                data.category_ids.push($(this).val());
+            });
+
+            // チェックされたタグ
+            $('input[name="tag_ids[]"]:checked').each(function () {
+                data.tag_ids.push($(this).val());
             });
 
             $.post(wpteAdmin.ajaxUrl, data)

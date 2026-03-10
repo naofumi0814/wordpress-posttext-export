@@ -154,6 +154,12 @@ class WPTE_Admin_Page {
             'date_to'       => isset( $_POST['date_to'] ) ? sanitize_text_field( wp_unslash( $_POST['date_to'] ) ) : '',
             'keyword'       => isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '',
             'post_ids'      => isset( $_POST['post_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['post_ids'] ) ) : '',
+            'category_ids'  => isset( $_POST['category_ids'] ) && is_array( $_POST['category_ids'] )
+                ? array_map( 'absint', wp_unslash( $_POST['category_ids'] ) )
+                : array(),
+            'tag_ids'       => isset( $_POST['tag_ids'] ) && is_array( $_POST['tag_ids'] )
+                ? array_map( 'absint', wp_unslash( $_POST['tag_ids'] ) )
+                : array(),
         );
 
         $query = new WPTE_Post_Query();
@@ -179,6 +185,12 @@ class WPTE_Admin_Page {
             'date_to'       => isset( $_POST['date_to'] ) ? sanitize_text_field( wp_unslash( $_POST['date_to'] ) ) : '',
             'keyword'       => isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '',
             'post_ids'      => isset( $_POST['post_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['post_ids'] ) ) : '',
+            'category_ids'  => isset( $_POST['category_ids'] ) && is_array( $_POST['category_ids'] )
+                ? array_map( 'absint', wp_unslash( $_POST['category_ids'] ) )
+                : array(),
+            'tag_ids'       => isset( $_POST['tag_ids'] ) && is_array( $_POST['tag_ids'] )
+                ? array_map( 'absint', wp_unslash( $_POST['tag_ids'] ) )
+                : array(),
         );
     }
 
@@ -231,6 +243,8 @@ class WPTE_Admin_Page {
      */
     public function render_page(): void {
         $post_types = WPTE_Post_Query::get_available_post_types();
+        $categories = WPTE_Post_Query::get_available_categories();
+        $tags       = WPTE_Post_Query::get_available_tags();
         $fields     = WPTE_Exporter::get_available_fields();
         $defaults   = WPTE_Exporter::get_default_fields();
         $fmt_opts   = WPTE_Text_Formatter::get_default_options();
@@ -334,6 +348,48 @@ class WPTE_Admin_Page {
                                 </p>
                             </td>
                         </tr>
+
+                        <!-- カテゴリー -->
+                        <?php if ( ! empty( $categories ) ) : ?>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'カテゴリー', 'wordpress-posttext-export' ); ?></th>
+                            <td>
+                                <fieldset class="wpte-taxonomy-list">
+                                    <?php foreach ( $categories as $cat ) : ?>
+                                        <label class="wpte-checkbox-label">
+                                            <input type="checkbox" name="category_ids[]" value="<?php echo esc_attr( $cat->term_id ); ?>">
+                                            <?php echo esc_html( $cat->name ); ?>
+                                            <span class="wpte-slug">(<?php echo esc_html( $cat->count ); ?>件)</span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </fieldset>
+                                <p class="description">
+                                    <?php esc_html_e( '未選択の場合は全カテゴリーが対象になります。', 'wordpress-posttext-export' ); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+
+                        <!-- タグ -->
+                        <?php if ( ! empty( $tags ) ) : ?>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'タグ', 'wordpress-posttext-export' ); ?></th>
+                            <td>
+                                <fieldset class="wpte-taxonomy-list">
+                                    <?php foreach ( $tags as $tag ) : ?>
+                                        <label class="wpte-checkbox-label">
+                                            <input type="checkbox" name="tag_ids[]" value="<?php echo esc_attr( $tag->term_id ); ?>">
+                                            <?php echo esc_html( $tag->name ); ?>
+                                            <span class="wpte-slug">(<?php echo esc_html( $tag->count ); ?>件)</span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </fieldset>
+                                <p class="description">
+                                    <?php esc_html_e( '未選択の場合は全タグが対象になります。', 'wordpress-posttext-export' ); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
                     </table>
 
                     <!-- 件数プレビュー -->

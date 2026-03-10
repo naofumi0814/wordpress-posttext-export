@@ -15,15 +15,45 @@
             $btn.prop('disabled', true);
             $result.text(wpteAdmin.strings.counting).removeClass('has-results no-results');
 
-            // フォームのフィルタ条件のみ収集（エクスポート用nonceは除外してexport発動を防ぐ）
-            var formData = $('#wpte-export-form')
-                .find(':input')
-                .not('[name="wpte_export_nonce"], [name="_wp_http_referer"], [name="export_format"], [name="filename"], [name="fields[]"], [name="separator_type"], [name="custom_separator"], [name="include_heading"], [name="heading_separator"], [name="post_separator"]')
-                .serialize();
-            formData += '&action=wpte_count_posts&nonce=' + encodeURIComponent(wpteAdmin.nonce);
+            // チェックされた値を収集
+            var postTypes = [];
+            $('input[name="post_types[]"]:checked').each(function () {
+                postTypes.push($(this).val());
+            });
 
-            $.post(wpteAdmin.ajaxUrl, formData)
-                .done(function (response) {
+            var postStatuses = [];
+            $('input[name="post_statuses[]"]:checked').each(function () {
+                postStatuses.push($(this).val());
+            });
+
+            var categoryIds = [];
+            $('input[name="category_ids[]"]:checked').each(function () {
+                categoryIds.push($(this).val());
+            });
+
+            var tagIds = [];
+            $('input[name="tag_ids[]"]:checked').each(function () {
+                tagIds.push($(this).val());
+            });
+
+            // AJAXリクエスト（エクスポート用nonceは含めない）
+            $.ajax({
+                url: wpteAdmin.ajaxUrl,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'wpte_count_posts',
+                    nonce: wpteAdmin.nonce,
+                    post_types: postTypes,
+                    post_statuses: postStatuses,
+                    category_ids: categoryIds,
+                    tag_ids: tagIds,
+                    date_from: $('input[name="date_from"]').val(),
+                    date_to: $('input[name="date_to"]').val(),
+                    keyword: $('input[name="keyword"]').val(),
+                    post_ids: $('input[name="post_ids"]').val()
+                },
+                success: function (response) {
                     if (response.success) {
                         var count = response.data.count;
                         if (count > 0) {
@@ -43,16 +73,17 @@
                             .addClass('no-results')
                             .removeClass('has-results');
                     }
-                })
-                .fail(function () {
+                },
+                error: function () {
                     $result
                         .text(wpteAdmin.strings.error)
                         .addClass('no-results')
                         .removeClass('has-results');
-                })
-                .always(function () {
+                },
+                complete: function () {
                     $btn.prop('disabled', false);
-                });
+                }
+            });
         });
 
         // カスタム区切り入力欄の表示切り替え

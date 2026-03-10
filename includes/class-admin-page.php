@@ -135,9 +135,6 @@ class WPTE_Admin_Page {
 
     /**
      * AJAX: 投稿件数を取得する
-     *
-     * フォーム全体がserialize()で送信されるため、
-     * get_query_params_from_post() を再利用して全フィルタ条件を適用する
      */
     public function ajax_count_posts(): void {
         check_ajax_referer( 'wpte_count_nonce', 'nonce' );

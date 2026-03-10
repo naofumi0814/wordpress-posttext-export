@@ -75,28 +75,6 @@
     margin-bottom: 6px;
 }
 
-/* 件数プレビュー */
-.wpte-count-preview {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-}
-
-.wpte-count-result {
-    display: inline-block;
-    margin-left: 15px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.wpte-count-result.has-results {
-    color: #0073aa;
-}
-
-.wpte-count-result.no-results {
-    color: #dc3232;
-}
-
 /* 注意表示 */
 .wpte-notice-inline {
     color: #996800;

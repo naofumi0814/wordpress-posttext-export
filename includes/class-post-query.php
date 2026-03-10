@@ -24,20 +24,6 @@ class WPTE_Post_Query {
     }
 
     /**
-     * 条件に一致する投稿件数を取得する
-     *
-     * @param array $params 検索条件
-     * @return int
-     */
-    public function count_posts( array $params ): int {
-        $query_args = $this->build_query_args( $params );
-        $query_args['fields'] = 'ids';
-        $query_args['no_found_rows'] = false;
-        $query = new WP_Query( $query_args );
-        return $query->found_posts;
-    }
-
-    /**
      * WP_Query用の引数を構築する
      *
      * @param array $params 検索条件
@@ -108,7 +94,7 @@ class WPTE_Post_Query {
             }
         }
 
-        // 将来的な拡張: カテゴリ、タグ、カスタムタクソノミー
+        // カテゴリー絞り込み
         if ( ! empty( $params['category_ids'] ) && is_array( $params['category_ids'] ) ) {
             $args['category__in'] = array_map( 'absint', $params['category_ids'] );
         }

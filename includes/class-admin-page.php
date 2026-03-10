@@ -33,7 +33,6 @@ class WPTE_Admin_Page {
         add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
         add_action( 'admin_init', array( $this, 'handle_export' ) );
-        add_action( 'wp_ajax_wpte_count_posts', array( $this, 'ajax_count_posts' ) );
     }
 
     /**
@@ -74,16 +73,6 @@ class WPTE_Admin_Page {
             true
         );
 
-        wp_localize_script( 'wpte-admin-script', 'wpteAdmin', array(
-            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( 'wpte_count_nonce' ),
-            'strings' => array(
-                'counting'  => __( '件数を取得中...', 'wordpress-posttext-export' ),
-                'result'    => __( '%d 件の投稿が見つかりました', 'wordpress-posttext-export' ),
-                'noResults' => __( '条件に一致する投稿がありません', 'wordpress-posttext-export' ),
-                'error'     => __( '件数の取得に失敗しました', 'wordpress-posttext-export' ),
-            ),
-        ) );
     }
 
     /**
@@ -131,25 +120,6 @@ class WPTE_Admin_Page {
         } else {
             $exporter->export_txt( $query_params, $fields, $options, $filename );
         }
-    }
-
-    /**
-     * AJAX: 投稿件数を取得する
-     */
-    public function ajax_count_posts(): void {
-        check_ajax_referer( 'wpte_count_nonce', 'nonce' );
-
-        if ( ! current_user_can( self::REQUIRED_CAPABILITY ) ) {
-            wp_send_json_error( array( 'message' => '権限がありません' ) );
-        }
-
-        // エクスポート時と同じメソッドでパラメータを取得（全条件を確実に反映）
-        $query_params = $this->get_query_params_from_post();
-
-        $query = new WPTE_Post_Query();
-        $count = $query->count_posts( $query_params );
-
-        wp_send_json_success( array( 'count' => $count ) );
     }
 
     /**
@@ -376,13 +346,6 @@ class WPTE_Admin_Page {
                         <?php endif; ?>
                     </table>
 
-                    <!-- 件数プレビュー -->
-                    <div class="wpte-count-preview">
-                        <button type="button" id="wpte-count-btn" class="button">
-                            <?php esc_html_e( '対象件数を確認', 'wordpress-posttext-export' ); ?>
-                        </button>
-                        <span id="wpte-count-result" class="wpte-count-result"></span>
-                    </div>
                 </div>
 
                 <!-- 出力項目選択エリア -->
